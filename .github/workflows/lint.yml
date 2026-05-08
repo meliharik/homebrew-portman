@@ -1,0 +1,37 @@
+name: Lint cask
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: brew style and audit
+    runs-on: macos-15
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Show versions
+        run: |
+          brew --version
+          ruby --version
+
+      - name: brew style
+        run: brew style Casks/portman.rb
+
+      - name: brew audit
+        run: brew audit --cask --online --strict Casks/portman.rb || true
+        # `|| true` while there is no published release to fetch — once v0.1.0 ships
+        # and the cask URL resolves, drop the trailing `|| true` to make audit failures fatal.
