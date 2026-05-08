@@ -17,22 +17,22 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - name: Set up Homebrew
-        id: setup-homebrew
-        uses: Homebrew/actions/setup-homebrew@main
-        with:
-          test-bot: false
-
-      - name: Checkout into tap directory
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: ${{ steps.setup-homebrew.outputs.repository-path }}
+
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@main
 
       - name: Show versions
         run: |
           brew --version
           ruby --version
 
-      - name: brew test-bot (syntax only)
-        working-directory: ${{ steps.setup-homebrew.outputs.repository-path }}
-        run: brew test-bot --only-tap-syntax
+      - name: Tap from workspace
+        run: brew tap meliharik/portman "$GITHUB_WORKSPACE"
+
+      - name: brew style
+        run: brew style meliharik/portman
+
+      - name: brew audit
+        run: brew audit --cask --strict --tap meliharik/portman
