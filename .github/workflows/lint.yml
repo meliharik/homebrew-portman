@@ -28,8 +28,12 @@ jobs:
           brew --version
           ruby --version
 
-      - name: Tap from workspace
-        run: brew tap meliharik/portman "$GITHUB_WORKSPACE"
+      - name: Stage workspace as tap
+        run: |
+          TAP_PATH="$(brew --repository)/Library/Taps/meliharik/homebrew-portman"
+          mkdir -p "$(dirname "$TAP_PATH")"
+          rm -rf "$TAP_PATH"
+          cp -R "$GITHUB_WORKSPACE" "$TAP_PATH"
 
       - name: brew style
         run: brew style meliharik/portman
